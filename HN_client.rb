@@ -11,11 +11,11 @@ require 'rest-client'
 class HomePage
   attr_reader :posts_list
 
-  def initialize
-    @posts_list = run
+  def initialize(num)
+    @posts_list = run(num)
   end
 
-  def run
+  def run(num)
 
     page = Nokogiri::HTML(File.read("hacker_news.html"))
 
@@ -36,12 +36,24 @@ class HomePage
     # end
 
     # posts_list.map! do |post|
-    #   p post
-    #   Post.new(post)
+    #   Post.new(post) if post.length == 6
     # end
 
-    # posts_list
-    links[0]
+    posts_list = []
+
+    num.times do |i|
+      posts_list << [links[i].text, links[i].attr('href')]
+    end
+
+    (num*2).times do |i|
+      posts_list[i/2] << subtexts[i].text
+      posts_list[i/2] << subtexts[i].attr('href')
+    end
+
+    p posts_list[0]
+
+    posts_list.map {|post| Post.new(post)}
+
   end
 
 
@@ -74,7 +86,7 @@ class Post
       comments[i/2] << comhead.attr('href')
     end
 
-    p comments[0]
+    comments.length
   end
 
 
